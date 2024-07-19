@@ -28,6 +28,6 @@
     }
 
     .input-label {
-        @apply text-xs text-slate-400
+        @apply text-sm text-slate-400
     }
 }

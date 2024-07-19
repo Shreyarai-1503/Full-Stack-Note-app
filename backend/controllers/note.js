@@ -68,20 +68,29 @@ export const deleteNote = async (req, res) => {
     }
 };
 
-// Pin or unpin a note
-export const pinNote = async (req, res) => {
-    const { id } = req.params;
-    const { pinned } = req.body;
+//Search Notes 
+export const searchNotes = async(req, res) => {
+    const {query} = req.query;
+
+    if(!query){
+        return res.status(400).json({error: true, message: "Search query is required"});
+    }
 
     try {
-        const updatedNote = await Note.findByIdAndUpdate(id, { pinned }, { new: true });
+        const matchingNotes = await Note.find({
+            $or: [
+                { title: { $regex: new RegExp(query, "i" )} },
+                { content: { $regex: new RegExp(query, "i" )} }
+            ]
+        });
+        console.log(matchingNotes);
+        return res.json({error: false, notes: matchingNotes, message: "Notes matching the search query retrieved successfully"});
 
-        if (!updatedNote) {
-            return res.status(404).json({ message: "Note not found" });
-        }
-
-        res.json(updatedNote);
     } catch (error) {
-        res.status(500).json({ message: "Failed to pin/unpin note" });
+        console.log(error)
+        return res.status(500).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
-};
+}

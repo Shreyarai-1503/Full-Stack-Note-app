@@ -1,34 +1,132 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddEditNotes from "../components/AddEditNotes";
 import Navbar from "../components/Navbar";
 import NoteCard from "../components/NoteCard";
 import { MdAdd } from "react-icons/md";
 import Modal from "react-modal";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../utils/axiosInstance";
+import Toast from "../components/Toast";
+import EmptyCard from "../components/EmptyCard";
 
 const Home = () => {
+  const navigate = useNavigate();
+
   const [openAddEditModal, setOpenAddEditModal] = useState({
     isShown: false,
     type: "add",
-    data: null,
+    noteData: null,
   });
+  const [userInfo, setUserInfo] = useState(null);
+  const [allNotes, setAllNotes] = useState([]);
+  const [showToast, setShowToast] = useState({
+    isShown: false,
+    type: "add",
+    message: "",
+  });
+  const [isSearch, setIsSearch] = useState(false);
+
+  const handleEdit = (noteData) => {
+    setOpenAddEditModal({ isShown: true, noteData: noteData, type: "edit" });
+  };
+
+  const deleteNote = async (noteData) => {
+    try {
+      const response = await axiosInstance.delete(`/notes/${noteData._id}`);
+      if (response.data && !response.data.error) {
+        getAllNotes();
+        showToastMessage("Note Deleted Successfully", "delete")
+      }
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        console.log(error, "Error: Try again");
+      }
+    }
+  };
+
+  const getUserInfo = async () => {
+    try {
+      const response = await axiosInstance.get("/get-user");
+
+      if (response.data && response.data.user) {
+        setUserInfo(response.data.user);
+      }
+    } catch (error) {
+      if (error.response.status === 401) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    }
+  };
+
+  const getAllNotes = async () => {
+    try {
+      const response = await axiosInstance.get("/notes");
+      if (response.data) {
+        setAllNotes(response.data);
+      }
+    } catch (error) {
+      console.log(error, "Error: Try again");
+    }
+  };
+
+  const handleCloseToast = () => {
+    setShowToast({
+      isShown: false,
+      message: "",
+    })
+  }
+
+  const showToastMessage = (message, type) => {
+    setShowToast({
+      isShown: true,
+      message: message,
+      type: type
+    })
+  }
+
+  const onSearchNote = async(query) => {
+    try {
+      const response = await axiosInstance.get(`/notes/search?query=${query}`);
+      console.log(response);
+      if(response.data && response.data.notes){
+        setIsSearch(true);
+        setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleClearSearch = () => {
+    setIsSearch(false);
+    getAllNotes();
+  }
+
+  useEffect(() => {
+    getUserInfo();
+    getAllNotes();
+    return () => {};
+  }, []);
 
   return (
     <>
-      <Navbar />
+      <Navbar userInfo={userInfo} onSearchNote={onSearchNote} handleClearSearch={handleClearSearch}/>
 
       <div className="container mx-auto">
-        <div className="grid grid-cols-3 gap-4 mt-8 mx-3">
-          <NoteCard
-            title="Meeting on 7th April"
-            date="3rd Apr 2024"
-            content="Meeting on 7th April posting at 3rd Apr 2024"
-            tags="#Meeting"
-            onEdit={() => {}}
-            onDelete={() => {}}
-            onPinNote={() => {}}
-            isPinned={false}
-          />
-        </div>
+        {allNotes.length > 0 ? <div className="grid grid-cols-3 gap-4 mt-8 mx-3">
+          {allNotes.map((note) => (
+            <NoteCard
+              key={note._id}
+              title={note.title}
+              content={note.content}
+              date={note.createdOn}
+              tags={note.tags}
+              onEdit={() => handleEdit(note)}
+              onDelete={() => deleteNote(note)}
+            />
+          ))}
+        </div> : <EmptyCard isSearch={isSearch}/>}
       </div>
 
       <button
@@ -62,11 +160,20 @@ const Home = () => {
             setOpenAddEditModal({
               isShown: false,
               type: "add",
-              data: null,
+              noteData: null,
             });
           }}
+          getAllNotes={getAllNotes}
+          showToastMessage={showToastMessage}
         />
       </Modal>
+
+      <Toast
+        isShown={showToast.isShown}
+        message={showToast.message}
+        type={showToast.type}
+        onClose={handleCloseToast}
+      />
     </>
   );
 };

@@ -23,8 +23,8 @@ const Navbar = ({userInfo, onSearchNote, handleClearSearch}) => {
     navigate("/login");
   };
   return (
-    <div className="bg-white flex items-center justify-between px-6 py-2 drop-shadow">
-      <h2 className="text-2xl font-semibold text-black py-2">Notes</h2>
+    <div className="bg-cardbg flex items-center justify-between px-6 py-2 drop-shadow">
+      <h2 className="text-2xl font-semibold text-white py-2">Notes</h2>
 
       <SearchBar value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} handleSearch={handleSearch} onClearSearch={onClearSearch}/>
 

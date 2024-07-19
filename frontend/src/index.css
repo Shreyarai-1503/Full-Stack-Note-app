@@ -6,10 +6,10 @@
 
 @layer base {
     html{
-        font-family: "Mukta", "sans-serif";
+        font-family: "Merriweather", "sans-serif";
     }
     body{
-        background-color: #ffffff;
+        background-color: #E69A8DFF;
         overflow-x: hidden
     }
 }
@@ -24,7 +24,7 @@
     }
 
     .icon-btn {
-        @apply text-xl text-slate-300 cursor-pointer hover:text-primary
+        @apply text-2xl text-white cursor-pointer hover:text-primary
     }
 
     .input-label {

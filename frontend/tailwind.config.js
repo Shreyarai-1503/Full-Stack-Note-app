@@ -6,6 +6,7 @@ export default {
       colors: {
         primary: "#2b85ff",
         secondary: "#ef863e",
+        cardbg: "#478CCF",
       }
     },
   },

@@ -51,7 +51,7 @@ Ensure you have the following installed:
 4. **Install Frontend Dependencies and run**
 
     ```bash
-    cd ../frontend
+    cd frontend
     npm install
     npm run dev
 

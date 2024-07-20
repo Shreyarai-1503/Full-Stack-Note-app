@@ -1,20 +1,44 @@
 import { MdCreate, MdDelete } from "react-icons/md";
 import moment from "moment";
+import { useState } from "react";
+import SelectedNote from "./SelectedNote";
 
-const NoteCard = ({
-  title,
-  date,
-  content,
-  tags,
-  onEdit,
-  onDelete,
-}) => {
+const NoteCard = ({ title, date, content, tags, onEdit, onDelete }) => {
+  const [isSelected, setIsSelected] = useState(false);
+
+  const handleSelect = () => {
+    setIsSelected(true);
+  };
+
+  const handleDeselect = () => {
+    setIsSelected(false);
+  };
+
+  if (isSelected) {
+    return (
+      <SelectedNote
+        title={title}
+        content={content}
+        date={date}
+        tags={tags}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onDeselect={() => handleDeselect()}
+      />
+    );
+  }
+
   return (
-    <div className="rounded-lg p-6 bg-cardbg hover:shadow-2xl transition-all ease-in-out">
+    <div
+      className="rounded-lg p-6 bg-cardbg hover:shadow-2xl transition-all ease-in-out cursor-pointer"
+      onClick={handleSelect}
+    >
       <div className="flex items-center justify-between">
         <div>
           <h6 className="text-2xl text-white font-bold">{title}</h6>
-          <span className=" text-white">{moment(date).format("Do MMM YYYY")}</span>
+          <span className=" text-white">
+            {moment(date).format("Do MMM YYYY")}
+          </span>
         </div>
       </div>
 

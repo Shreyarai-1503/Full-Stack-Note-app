@@ -10,7 +10,7 @@ const NoteCard = ({
   onDelete,
 }) => {
   return (
-    <div className="border rounded-lg p-6 bg-cardbg hover:shadow-xl transition-all ease-in-out">
+    <div className="rounded-lg p-6 bg-cardbg hover:shadow-2xl transition-all ease-in-out">
       <div className="flex items-center justify-between">
         <div>
           <h6 className="text-2xl text-white font-bold">{title}</h6>
